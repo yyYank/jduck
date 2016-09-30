@@ -31,14 +31,11 @@ public class Inject {
      * 
      * @param <T>
      * @param target
-     * @param dummy トリック用のダミー。指定しちゃダメ、絶対。
      * @return
      * @throws InterfaceNotFoundRuntimeException 注入対象のインタフェースが見つからなかった場合
      */
     @SuppressWarnings("unchecked")
     public static <T> T to(Object target) {
-        //assert (dummy.length == 0) : "0じゃないとダメ、絶対。";
-        //Class<?> clazz = dummy.getClass().getComponentType();
 
         Box box = new Box();
         T dummy = estimateClass(box);
@@ -64,16 +61,12 @@ public class Inject {
     }
 
     private static Object createProxy(final Object obj, final Class<?>[] interfaces) {
-        InvocationHandler invoc = new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                return ReflectionUtils.invoke(obj, method.getName(), args);
-            }
-        };
+        InvocationHandler invoc = (Object proxy, Method method, Object[] args) -> ReflectionUtils.invoke(obj, method.getName(), args);
         return Proxy.newProxyInstance(obj.getClass().getClassLoader(), interfaces, invoc);
     }
 
     private static Class<?>[] getInterfaces(final Class<?> clazz) {
-        List<Class<?>> interfaceList = new ArrayList<Class<?>>();
+        List<Class<?>> interfaceList = new ArrayList<>();
         if (clazz.isInterface()) {
             interfaceList.add(clazz);
         }
